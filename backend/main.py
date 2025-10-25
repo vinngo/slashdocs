@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from services.repo_handler import ingest_repo
 
 
 app = FastAPI(title="SlashDocs Backend")
@@ -19,8 +20,12 @@ def root():
 
 @app.post("/api/ingest")
 def ingest(repo_url: str):
-    return {"message": "POST API /ingest called."}
-    #return ingest_repo(repo_url)
+    try:
+        result = ingest_repo(repo_url)
+        return {"status": "success", "ingested_files": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    #return {"message": "POST API /ingest called."}
 
 @app.post("/api/chat")
 def chat(query: str):
