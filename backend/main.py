@@ -1,8 +1,25 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from services.repo_handler import ingest_repo
-from services.preprocessing import load_files
 
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env from backend directory
+env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
+# Optional debug
+print("✅ Loaded .env from:", env_path)
+print("CHROMA_API_KEY:", os.getenv("CHROMA_API_KEY"))
+
+import sys
+from pathlib import Path as _Path
+sys.path.append(str(_Path(__file__).resolve().parent))
+from services.repo_handler import ingest_repo        # your clone/scraper
+from services.preprocessing import load_files         # your file loader
+from services.chunking import chunk_files            # your chunking logic
+#from services.chromadb_service import index_repository, query_repository  # embedding + retrieval
 
 
 
@@ -22,14 +39,30 @@ def root():
     return {"message": "SlashDocs backend running."}
 
 @app.post("/api/ingest")
-def ingest(repo_url: str):
+async def ingest(repo_url: str):
+    """
+    Ingests a GitHub repo → preprocess → embed → store in ChromaDB
+    """
     try:
+        # Step 1: Clone & scrape repo files
         repo_files = ingest_repo(repo_url)
-        result = load_files(repo_files)
-        return {"status": "success", "ingested_files": result}
+
+        # Step 2: Load + extract metadata
+        docs = load_files(repo_files)
+
+        # Step 2.5: Create Chunks at the file level
+
+        chunks = chunk_files(docs)
+
+        # Step 3: Embed + store in ChromaDB
+        repo_name = repo_url.split("/")[-1]
+ 
+
+        #result = await index_repository(repo_name, docs)
+
+        #return {"status": "success", "indexed": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    #return {"message": "POST API /ingest called."}
 
 @app.post("/api/chat")
 def chat(query: str):

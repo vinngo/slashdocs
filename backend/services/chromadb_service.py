@@ -4,7 +4,7 @@ import chromadb
 from chromadb.api import ClientAPI
 from chromadb.api.models.Collection import Collection
 
-from ..config import get_chroma_settings
+from config import get_chroma_settings
 
 _SETTINGS = get_chroma_settings()
 _client: ClientAPI | None = None
