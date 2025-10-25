@@ -19,10 +19,17 @@ import sys
 from pathlib import Path as _Path
 
 sys.path.append(str(_Path(__file__).resolve().parent))
-from services.repo_handler import ingest_repo  # your clone/scraper
-from services.preprocessing import load_files  # your file loader
-from services.chunking import chunk_files  # your chunking logic
-from services.chromadb_service import index_repository  # embedding + retrieval
+from services.repo_handler import ingest_repo
+from services.preprocessing import load_files
+from services.chunking import chunk_files
+from services.chromadb_service import index_repository
+from services.retrieval import query_repository, get_all_files
+from services.doc_generation import (
+    generate_overview_docs,
+    generate_file_docs,
+    answer_question,
+)
+from models.documentation import DocsData
 
 
 app = FastAPI(title="SlashDocs Backend")
@@ -67,7 +74,66 @@ async def ingest(repo_url: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/chat")
-def chat(query: str):
-    return {"message": "POST API /chat called."}
-    # return {"answer": chat_with_repo(query)}
+@app.get("/api/repos/{repo_name}/docs", response_model=DocsData)
+async def get_repo_docs(repo_name: str) -> DocsData:
+    """
+    Generate structured overview documentation for a repository.
+
+    Returns:
+        DocsData object with sections, file_tree, and metadata
+    """
+    try:
+        docs = generate_overview_docs(repo_name)
+        return docs
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/repos/{repo_name}/files")
+async def list_repo_files(repo_name: str):
+    """
+    List all files in an indexed repository.
+    """
+    try:
+        files = get_all_files(repo_name)
+        return {"repo_name": repo_name, "files": files, "count": len(files)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/repos/{repo_name}/files/{file_path:path}/docs")
+async def get_file_docs(repo_name: str, file_path: str):
+    """
+    Generate documentation for a specific file.
+    """
+    try:
+        docs = generate_file_docs(repo_name, file_path)
+        return docs
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/repos/{repo_name}/query")
+async def query_repo(repo_name: str, question: str, n_results: int = 10):
+    """
+    Query a repository using semantic search.
+    Returns relevant code chunks without LLM generation.
+    """
+    try:
+        results = query_repository(repo_name, question, n_results=n_results)
+        return {"repo_name": repo_name, "query": question, "results": results}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/repos/{repo_name}/ask")
+async def ask_question(repo_name: str, question: str):
+    """
+    Ask a question about the repository and get an AI-generated answer.
+    Uses RAG (Retrieval-Augmented Generation).
+    """
+    try:
+        result = answer_question(repo_name, question)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
