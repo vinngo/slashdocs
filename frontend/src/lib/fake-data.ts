@@ -5,19 +5,14 @@ export interface FileNode {
   children?: FileNode[];
 }
 
+export interface Section {
+  id: number;
+  title: string;
+  content: string;
+}
+
 export interface DocsData {
-  sections: {
-    overview: string;
-    getting_started: string;
-    project_structure: string;
-    core_concepts: string;
-    architecture: string;
-    api_reference: string;
-    configuration: string;
-    development: string;
-    testing: string;
-    deployment: string;
-  };
+  sections: Section[];
   file_tree: FileNode[];
   metadata: {
     repo_name: string;
@@ -31,8 +26,11 @@ export interface DocsData {
 }
 
 export const fakeDocsData: DocsData = {
-  sections: {
-    overview: `# Project Overview
+  sections: [
+    {
+      id: 1,
+      title: "Overview",
+      content: `# Project Overview
 
 This is a modern web application built with Next.js and TypeScript, designed to provide a seamless user experience with server-side rendering and static site generation capabilities.
 
@@ -50,8 +48,11 @@ This is a modern web application built with Next.js and TypeScript, designed to 
 - TypeScript 5
 - Tailwind CSS
 - Shadcn/ui components`,
-
-    getting_started: `# Getting Started
+    },
+    {
+      id: 2,
+      title: "Getting Started",
+      content: `# Getting Started
 
 Follow these steps to get the project up and running on your local machine.
 
@@ -82,8 +83,11 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 The page auto-updates as you edit files in the \`src\` directory.`,
-
-    project_structure: `# Project Structure
+    },
+    {
+      id: 3,
+      title: "Project Structure",
+      content: `# Project Structure
 
 \`\`\`
 repo/
@@ -106,8 +110,11 @@ repo/
 - **src/components**: Reusable React components organized by feature
 - **src/lib**: Utility functions, helpers, and shared logic
 - **public**: Static files like images, fonts, and icons`,
-
-    core_concepts: `# Core Concepts
+    },
+    {
+      id: 4,
+      title: "Core Concepts",
+      content: `# Core Concepts
 
 ## Component Architecture
 
@@ -138,8 +145,11 @@ async function getData() {
   return res.json();
 }
 \`\`\``,
-
-    architecture: `# Architecture
+    },
+    {
+      id: 5,
+      title: "Architecture",
+      content: `# Architecture
 
 ## High-Level Architecture
 
@@ -165,8 +175,11 @@ The application follows a modern jamstack architecture with the following layers
 - **Component Composition**: Building complex UIs from simple components
 - **Server-First**: Leveraging server components for better performance
 - **Progressive Enhancement**: Core functionality works without JavaScript`,
-
-    api_reference: `# API Reference
+    },
+    {
+      id: 6,
+      title: "API Reference",
+      content: `# API Reference
 
 ## Components
 
@@ -216,8 +229,11 @@ import { Button } from '@/components/ui/button';
 **Props**:
 - \`onClick\`: function - Click handler
 - \`children\`: ReactNode - Button content`,
-
-    configuration: `# Configuration
+    },
+    {
+      id: 7,
+      title: "Configuration",
+      content: `# Configuration
 
 ## Environment Variables
 
@@ -257,8 +273,11 @@ The \`tsconfig.json\` includes:
 - Path aliases (@/ for src/)
 - ES2022 target
 - Module resolution for Next.js`,
-
-    development: `# Development Guide
+    },
+    {
+      id: 8,
+      title: "Development",
+      content: `# Development Guide
 
 ## Code Style
 
@@ -296,8 +315,11 @@ export default function MyComponent({ title, onAction }: MyComponentProps) {
 - Add "use client" only when needed
 - Optimize images with next/image
 - Implement error boundaries`,
-
-    testing: `# Testing
+    },
+    {
+      id: 9,
+      title: "Testing",
+      content: `# Testing
 
 ## Testing Strategy
 
@@ -334,8 +356,11 @@ npm test -- --watch
 # Generate coverage report
 npm test -- --coverage
 \`\`\``,
-
-    deployment: `# Deployment
+    },
+    {
+      id: 10,
+      title: "Deployment",
+      content: `# Deployment
 
 ## Deployment Options
 
@@ -383,7 +408,8 @@ docker run -p 3000:3000 my-app
 - [ ] Set up error monitoring
 - [ ] Configure CDN
 - [ ] Test in production mode locally`,
-  },
+    },
+  ],
 
   file_tree: [
     {
