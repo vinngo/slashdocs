@@ -3,7 +3,7 @@ from chromadb.api import ClientAPI
 from chromadb.api.models.Collection import Collection
 from fastapi import Depends
 
-from .config import get_chroma_settings
+from ..config import get_chroma_settings
 
 _client: ClientAPI | None = None
 _collection: Collection | None = None
