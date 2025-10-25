@@ -14,6 +14,11 @@ class ChromaSettings:
     database: str
 
 
+@dataclass(frozen=True)
+class OpenAISettings:
+    api_key: str
+
+
 def _require_env(name: str) -> str:
     value = os.getenv(name)
     if not value:
@@ -28,4 +33,12 @@ def get_chroma_settings() -> ChromaSettings:
         api_key=_require_env("CHROMA_API_KEY"),
         tenant=_require_env("CHROMA_TENANT_ID"),
         database=_require_env("CHROMA_DATABASE"),
+    )
+
+
+@lru_cache(maxsize=1)
+def get_openai_settings() -> OpenAISettings:
+    """Return validated configuration for the OpenAI client."""
+    return OpenAISettings(
+        api_key=_require_env("OPENAI_API_KEY"),
     )
