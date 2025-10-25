@@ -1,11 +1,31 @@
-from pydantic import BaseSettings
+from dataclasses import dataclass
+from functools import lru_cache
+import os
 
-class Settings(BaseSettings):
-    OPENAI_API_KEY: str
-    CHROMA_PATH: str = "./chroma_store"
-    TEMP_REPO_DIR: str = "./repos/temp_repo"
 
-    class Config:
-        env_file = ".env"
+class MissingConfigError(KeyError):
+    """Raised when an expected environment variable is absent."""
 
-settings = Settings()
+
+@dataclass(frozen=True)
+class ChromaSettings:
+    api_key: str
+    tenant: str
+    database: str
+
+
+def _require_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise MissingConfigError(f"Missing required environment variable: {name}")
+    return value
+
+
+@lru_cache(maxsize=1)
+def get_chroma_settings() -> ChromaSettings:
+    """Return validated configuration for the Chroma cloud client."""
+    return ChromaSettings(
+        api_key=_require_env("CHROMA_API_KEY"),
+        tenant=_require_env("CHROMA_TENANT_ID"),
+        database=_require_env("CHROMA_DATABASE"),
+    )
