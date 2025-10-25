@@ -30,5 +30,6 @@ def ingest_repo(repo_url: str):
         print(f"❌ Error during repo ingestion: {e}")
         raise e
 
-    finally :
-        shutil.rmtree(tmp_dir)
+    #commented out to preserve files for loading
+    #finally :
+        #shutil.rmtree(tmp_dir)
