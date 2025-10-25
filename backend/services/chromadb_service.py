@@ -7,7 +7,6 @@ from chromadb.api.models.Collection import Collection
 from config import get_chroma_settings
 from services.embeddings import generate_embeddings
 
-_SETTINGS = get_chroma_settings()
 _client: ClientAPI | None = None
 
 
@@ -17,10 +16,11 @@ def get_chroma_client() -> ClientAPI:
     """
     global _client
     if _client is None:
+        settings = get_chroma_settings()
         _client = chromadb.CloudClient(
-            api_key=_SETTINGS.api_key,
-            tenant=_SETTINGS.tenant,
-            database=_SETTINGS.database,
+            api_key=settings.api_key,
+            tenant=settings.tenant,
+            database=settings.database,
         )
     return _client
 
