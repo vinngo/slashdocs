@@ -24,8 +24,8 @@ def root():
 @app.post("/api/ingest")
 def ingest(repo_url: str):
     try:
-        result = ingest_repo(repo_url)
-        result = load_files(result)
+        repo_files = ingest_repo(repo_url)
+        result = load_files(repo_files)
         return {"status": "success", "ingested_files": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
