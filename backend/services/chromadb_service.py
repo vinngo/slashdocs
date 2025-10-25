@@ -1,10 +1,11 @@
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, List, Dict
 
 import chromadb
 from chromadb.api import ClientAPI
 from chromadb.api.models.Collection import Collection
 
 from config import get_chroma_settings
+from services.embeddings import generate_embeddings
 
 _SETTINGS = get_chroma_settings()
 _client: ClientAPI | None = None
@@ -50,3 +51,42 @@ def upsert_documents(
         documents=list(documents),
         metadatas=[dict(metadata) for metadata in metadatas],
     )
+
+
+def index_repository(repo_name: str, chunks: List[Dict]) -> Dict[str, Any]:
+    """
+    Index a repository's chunks into ChromaDB with OpenAI embeddings.
+
+    Args:
+        repo_name: Name of the repository (used for collection ID)
+        chunks: List of chunk dictionaries containing 'id', 'document', and 'metadata'
+
+    Returns:
+        Dictionary with indexing status and metadata
+    """
+    # Get or create collection for this repo
+    collection = get_repo_collection(repo_name)
+
+    # Extract data from chunks
+    ids = [chunk["id"] for chunk in chunks]
+    documents = [chunk["document"] for chunk in chunks]
+    metadatas = [chunk["metadata"] for chunk in chunks]
+
+    # Generate embeddings using OpenAI
+    embeddings = generate_embeddings(documents)
+
+    # Upsert to ChromaDB
+    upsert_documents(
+        collection,
+        ids=ids,
+        embeddings=embeddings,
+        documents=documents,
+        metadatas=metadatas,
+    )
+
+    return {
+        "repo_name": repo_name,
+        "collection_name": f"repo_{repo_name}",
+        "chunks_indexed": len(chunks),
+        "status": "success",
+    }
