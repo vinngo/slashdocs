@@ -66,7 +66,7 @@ export default function DocsPage() {
   };
 
   if (!loading && docs) {
-    return <DocsViewer docs={docs} />;
+    return <DocsViewer docs={docs} repoId={repo_name} />;
   }
 
   return <LoadingScreen status={status} />;

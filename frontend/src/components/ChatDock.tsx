@@ -19,7 +19,7 @@ export default function ChatDock({
   repoId,
   filePaths,
   metadata,
-  title = "ChatDock",
+  title = "Chat",
 }: ChatDockProps) {
   const {
     messages,
@@ -30,6 +30,7 @@ export default function ChatDock({
     stopStreaming,
     resetConversation,
   } = useChatStream({
+    endpoint: "/api/repos/ask",
     repoId,
     filePaths,
     metadata,
@@ -60,7 +61,7 @@ export default function ChatDock({
   };
 
   return (
-    <div className="flex h-full min-h-[80vh] flex-col overflow-hidden rounded-xl border border-border bg-background">
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-background">
       <header className="flex items-center justify-between border-b px-4 py-2">
         <div className="flex flex-col">
           <span className="text-sm font-semibold text-foreground">{title}</span>

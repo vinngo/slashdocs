@@ -133,9 +133,24 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
   const processChunk: ProcessChunkFn = useCallback(
     (chunk) => {
       const assistantId = pendingAssistantIdRef.current;
-      if (!assistantId) return;
+      console.log(
+        "Processing chunk, assistantId:",
+        assistantId,
+        "chunk:",
+        chunk,
+      );
+      if (!assistantId) {
+        console.warn("No assistantId - skipping chunk");
+        return;
+      }
 
       if (chunk.type === "token" && chunk.delta) {
+        console.log(
+          "Adding token to assistant:",
+          assistantId,
+          "delta:",
+          chunk.delta,
+        );
         updateAssistant(assistantId, (message) => ({
           ...message,
           content: `${message.content}${chunk.delta}`,
@@ -167,12 +182,16 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
       }
 
       if (chunk.type === "control") {
+        console.log("Control chunk received:", chunk.status);
         if (chunk.status === "aborted") {
           setStatus("aborted");
+          pendingAssistantIdRef.current = null;
         } else if (chunk.status === "completed") {
           setStatus("idle");
+          pendingAssistantIdRef.current = null;
         }
-        pendingAssistantIdRef.current = null;
+        // Don't clear assistantId for "in_progress" status
+        return;
       }
     },
     [setError, updateAssistant],
@@ -222,8 +241,7 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
         ...messages
           .filter(
             (message) =>
-              message.role !== "assistant" ||
-              message.content.trim().length > 0,
+              message.role !== "assistant" || message.content.trim().length > 0,
           )
           .map<ChatCompletionRequestMessage>((message) => ({
             role: message.role,
@@ -317,6 +335,7 @@ export function useChatStream(options: UseChatStreamOptions = {}) {
             for (const payload of payloads) {
               try {
                 const chunk = JSON.parse(payload) as ChatStreamChunk;
+                console.log("Received SSE chunk:", chunk);
                 processChunk(chunk);
               } catch (err) {
                 console.warn("Failed to parse SSE chunk", err);
