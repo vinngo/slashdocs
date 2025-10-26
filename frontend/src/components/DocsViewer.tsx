@@ -7,7 +7,7 @@ import { useState } from "react";
 import TabBar from "./docs/tabbar";
 import ChatContent from "./docs/chat-content";
 import { SidebarProvider, SidebarTrigger } from "./ui/sidebar";
-import { DocsData, fakeDocsData } from "@/lib/fake-data";
+import { DocsData } from "@/lib/fake-data";
 
 interface DocsViewerProps {
   docs: DocsData;

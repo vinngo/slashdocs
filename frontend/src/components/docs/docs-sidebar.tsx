@@ -23,7 +23,7 @@ export default function DocsSidebar() {
         const visible = entries.find((entry) => entry.isIntersecting);
         if (visible) setActiveSection(visible.target.id);
       },
-      { rootMargin: "-40% 0px -55% 0px" }
+      { rootMargin: "-40% 0px -55% 0px" },
     );
 
     fakeDocsData.sections.forEach((section) => {
@@ -59,8 +59,8 @@ export default function DocsSidebar() {
                       onClick={(e) => handleClick(e, section.id)}
                       className={`block px-2 py-1 rounded-md transition-colors ${
                         activeSection === section.id.toString()
-                          ? "bg-blue-100 text-blue-600 font-semibold"
-                          : "hover:bg-gray-100"
+                          ? "text-accent font-semibold"
+                          : "hover:bg-gray-100 hover:text-accent"
                       }`}
                     >
                       {section.title}

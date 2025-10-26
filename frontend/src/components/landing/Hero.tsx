@@ -18,6 +18,9 @@ export default function Hero() {
     setError("");
     setLoading(true);
 
+    router.push("/docs/repo_vinn");
+    return;
+
     const url = formData.get("url") as string;
 
     if (!url.trim()) {
@@ -72,28 +75,56 @@ export default function Hero() {
     <div className="relative flex flex-col items-center justify-center h-screen overflow-hidden">
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center">
-        <h1 className="text-3xl font-bold text-center">
-          Index any Github repo
+        <h1 className="text-3xl font-extralight text-center font-sans">
+          <span className="text-5xl">
+            Index{" "}
+            {
+              <span
+                className="text-accent font-normal"
+                style={{ textShadow: "0 0 4px currentColor" }}
+              >
+                any
+              </span>
+            }{" "}
+            Github repo
+          </span>
           <br />
-          Get beautiful documentation
+          <br />
+          Get{" "}
+          <span
+            className="text-accent font-normal"
+            style={{ textShadow: "0 0 4px currentColor" }}
+          >
+            beautiful
+          </span>{" "}
+          documentation
           <br />
           +
           <br />
-          RAG-informed chat
+          <span
+            className="text-accent font-normal"
+            style={{ textShadow: "0 0 4px currentColor" }}
+          >
+            RAG
+          </span>{" "}
+          informed chat
         </h1>
         <form
-          className="py-15 flex flex-col gap-3 items-center w-full"
+          className="py-13 flex flex-col gap-3 items-center w-full"
           action={handleSubmit}
         >
           <Input
             name="url"
-            className="h-10 w-max"
+            className="h-12 w-96 text-base border-2 border-accent bg-background/80 backdrop-blur-sm focus:border-accent focus:ring-2 focus:ring-accent/50 transition-all"
             placeholder="https://github.com/user/repo"
             required
             disabled={loading}
           />
           {error && <p className="text-red-500 text-sm">{error}</p>}
-          <Button disabled={loading}>
+          <Button
+            disabled={loading}
+            className="h-12 px-8 mt-4 text-base font-semibold"
+          >
             {loading ? "Indexing..." : "Start Indexing"}
           </Button>
         </form>
